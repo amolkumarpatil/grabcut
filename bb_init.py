@@ -2,13 +2,19 @@ import cv2
 import numpy as np 
 import time
 import os 
+import hog_detector 
+import imutils
+im_path = input("Enter input image path: ")
+im = cv2.imread(im_path)
+im = imutils.resize(im, width=min(400, im.shape[1]))
+# im = "C:/Users/Amol/Pictures/sample.jpg"
 
-im = input("Enter input image path: ")
-
-mask = np.zeros(im.shape[:2], dtype="uint8")
 
 # bounding box of detected object
-rect = (153, 17, 231, 189)
+rect = hog_detector.pedestrian_detection(im)
+mask = np.zeros(im.shape[:2], dtype="uint8")
+# # bounding box of detected object
+# rect = (153, 17, 231, 189)
 
 # below numpy arrays are used for segmenting foreground and background for cv2.grabcut
 fgModel = np.zeros((1, 65), dtype="float")
@@ -18,7 +24,7 @@ bgModel = np.zeros((1, 65), dtype="float")
 # time is used to note the timings as grabcut method runs on given iterations it may vary based on resolution and bb
 start = time.time()
 (mask, bgModel, fgModel) = cv2.grabCut(im, mask, rect, bgModel,
-	fgModel, iterCount=30, mode=cv2.GC_INIT_WITH_RECT)
+	fgModel, iterCount=60, mode=cv2.GC_INIT_WITH_RECT)
 end = time.time()
 
 print("time taken to run grabcut:", (start-end))
